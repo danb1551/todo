@@ -1,0 +1,12 @@
+name: deploy to prod
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: deploy and run
+        run: cd ~/skola/todo && git pull && docker compose up -d --build

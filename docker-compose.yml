@@ -1,0 +1,17 @@
+services:
+    server:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ".:/app"
+        ports:
+          - "9004:9004"
+    db:
+        image: mongo:8
+
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+            MONGO_INITDB_DATABASE: db
