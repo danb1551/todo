@@ -6,15 +6,17 @@ const taskSchema = new mongoose.Schema({
     },
     title: {
         type: String,
-        required: [true, 'Name is required'],
+        required: [true, 'Title is required'],
         trim: false
     },
     doUntil: {
         type: Date,
+        required: [true, 'doUntil is required'],
         default: Date.now
     },
     createdAt: {
         type: Date,
+        required: [true, 'createdAt is required'],
         default: Date.now
     },
     text: {

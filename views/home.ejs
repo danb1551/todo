@@ -2,14 +2,111 @@
 <html>
     <head>
         <title>Demo</title>
+        <style>
+            body {
+                margin: 0;
+            }
+            header {
+                width: 95%;
+                height: 7.5%;
+                padding: 2.5%;
+            }
+            main {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                height: 92.5%;
+            }
+            .left, .right {
+                width: 50%;
+                height: 100%;
+                padding: 5%;
+            }
+            form {
+                gap: 12px;
+                display: flex;
+                flex-direction: column;
+            }
+            .new {
+                background-color: rgb(226, 226, 226);
+                border: 2px solid black;
+                border-radius: 12px;
+                padding: 12px;
+            }
+            .task {
+                border: 1px dotted black;
+                border-radius: 12px;
+                margin: 12px 0;
+                padding: 6px;
+            }
+        </style>
+                <script>
+                    function stringToDate(string) {
+                        var f = string.split("-");
+                        return f[2].substring(0, 2) + ". " + f[1] + ". " + f[0]; 
+                    }
+                    async function myDeleteTask(id) {
+                        await fetch("/api/tasks/" + id, {method: 'DELETE',});
+                        loadTasks();
+                    }
+                    async function loadTasks() {
+                        document.getElementById("info").innerText = "Načítám";
+                        try {
+                            const response = await fetch("/api/tasks");
+                            if (!response.ok) {
+                                document.getElementById("info").innerText = "Chyba při načítání: " + response.status;
+                                throw new Error(`Response status: ${response.status}`);
+                            }
+                            const result = await response.json();
+                            console.log(result);
+                            document.getElementById('right').innerHTML = "<p id='info'></p>";
+                            result.forEach((v) => {
+                                console.log(v);
+                                document.getElementById('right').innerHTML += "<article class='task'><h3>Title: " + v.title + "</h3><p>Text: " +
+                                    + v.text + "</p><p>Do until: " + stringToDate(v.doUntil) + "</p><button onclick='myDeleteTask(\"" + v._id + "\")'>Delete</button></article>";
+                            })
+                            document.getElementById('right').innerHTML += "<button onclick='loadTasks()'>Reload</button>";
+                        } catch (error) {
+                            console.error(error.message);
+                        }
+                    }
+                </script>
     </head>
     <body>
         <header>
             <h1>Mňauuuuuuuuuuuuuuuuu</h1>
         </header>
         <main>
-            <section class="left"></section>
-            <section class="right"></section>
+            <section class="left">
+                <form action="/api/tasks" method="post" class="new">
+                    <h1>Create new task</h1>
+                    <div class="name">
+                        <label for="title">Title: </label>
+                        <input type="text" name="title" id="title" required>
+                    </div>
+                    <div class="doUntil">
+                        <label for="doUntil">Do until: </label>
+                        <input type="date" name="doUntil" id="doUntil" required>
+                    </div>
+                    <div class="createdAt">
+                        <label for="createdAt">Created at: </label>
+                        <input type="date" name="createdAt" id="createdAt" readonly>
+                        <script>
+                            let today = new Date();
+                            document.getElementById("createdAt").value = today.getFullYear() + "-" + (today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1) + "-" + (today.getDate() < 10 ? "0" + today.getDate() : today.getDate());
+                        </script>
+                    </div>
+                    <div class="text">
+                        <label for="text">Text: </label>
+                        <textarea name="text" id="text"></textarea>
+                    </div>
+                    <button type="submit">Submit</button>
+                </form>
+            </section>
+            <section class="right" id="right">
+                <button onclick="loadTasks()">Get all tasks</button>
+                <p id="info"></p>
+            </section>
         </main>
     </body>
 </html>
